@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<link href="style.css" rel="stylesheet" media="all">
+<script src="/jquery.latest.js"></script>
+<script src="/cookie.jquery.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://192.168.1.155:80');
+  socket.on('news', function (data) {
+    console.log(data);
+  });
+if ($.cookie("id")) {
+	//already has id, do nothing
+}
+else {
+	var randomNum = Math.floor(Math.random()*1000000);
+	$.cookie("id", randomNum, { expires: 365 });
+}
+
+    var id = $.cookie("id");
+    var key = "no key set";
+    var keydown = false;
+
+    var sendKey = function(id,key) { 
+	socket.emit('my other event', { id:id,key:key });
+    };
+
+$.fn.nodoubletapzoom = function() {
+      $(this).bind('touchstart', function preventZoom(e) {
+        var t2 = e.timeStamp
+          , t1 = $(this).data('lastTouch') || t2
+          , dt = t2 - t1
+          , fingers = e.originalEvent.touches.length;
+        $(this).data('lastTouch', t2);
+        if (!dt || dt > 500 || fingers > 1) return; // not double-tap
+
+        e.preventDefault(); // double tap - prevent the zoom
+        // also synthesize click events we just swallowed up
+        $(this).trigger('click').trigger('click');
+      });
+  };
+
+    window.onload = function() {
+     
+
+	$('body').bind('touchmove', function(event) { event.preventDefault() });   
+
+	$('body').keydown(function(event) {
+
+	if (event.which == 37 | event.which == 52) {
+	key = "leftPress";
+	}
+	else if (event.which == 38) {
+	key = "upPress";
+	}
+	else if (event.which == 39) {
+	key = "rightPress";
+	}
+	else if (event.which == 40) {
+	key = "downPress";
+	}
+
+        if (keydown != key) { 
+		sendKey(id,key);
+	}
+	keydown = key;
+
+	}).keyup(function(event) {
+
+	if (event.which == 37) {
+	key = "leftRelease";
+	}
+	else if (event.which == 38) {
+	key = "upRelease";
+	}
+	else if (event.which == 39) {
+	key = "rightRelease";
+	}
+	else if (event.which == 40) {
+	key = "downRelease";
+	}
+	sendKey(id,key);
+	keydown = key;
+	});
+     
+
+	$("#l").bind('touchend', function () { 
+	key = "leftRelease";
+	sendKey(id,key);
+	}).bind('touchstart', function () { 
+	key = "leftPress";
+	sendKey(id,key);
+	});
+
+	$("#u").bind('touchend', function () { 
+	key = "upRelease";
+	sendKey(id,key);
+	}).bind('touchstart', function () { 
+	key = "upPress";
+	sendKey(id,key);
+	});
+
+	$("#r").bind('touchend', function () { 
+	key = "rightRelease";
+	sendKey(id,key);
+	}).bind('touchstart', function () { 
+	key = "rightPress";
+	sendKey(id,key);
+	});
+	
+	$("#d").bind('touchend', function () { 
+	key = "downRelease";
+	sendKey(id,key);
+	}).bind('touchstart', function () { 
+	key = "downPress";
+	sendKey(id,key);
+	});
+
+
+var col = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
+		$('body').css('background-color', col)
+
+sendKey(id,col)
+
+    }
+
+
+</script>
+<style>
+html, body {
+margin: 0;
+padding: 0;
+}
+
+border: 8px solid #f00;
+
+#controller, img {
+width:100%;
+}
+#image-blocker {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+img {
+ image-rendering:optimizeSpeed;             /* Legal fallback                 */
+ image-rendering:-moz-crisp-edges;          /* Firefox                        */
+ image-rendering:-o-crisp-edges;            /* Opera                          */
+ image-rendering:-webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+ image-rendering:optimize-contrast;         /* CSS3 Proposed                  */
+ -ms-interpolation-mode:nearest-neighbor;   /* IE8+                           */
+}
+#container {
+position:relative;
+-webkit-user-select: none;
+}
+#u {
+    height: 78%;
+    left: 59%;
+    position: absolute;
+    top: 7%;
+    width: 35%;
+
+}
+#l {
+    height: 42%;
+    left: 6%;
+    position: absolute;
+    top: 13%;
+    width: 19%;
+}
+#r {
+    height: 42%;
+    left: 32%;
+    position: absolute;
+    top: 13%;
+    width: 19%;
+}
+</style>
+<body style="background-color:pink;">
+<div id="container">
+<img id="controller" src="controller.png" width="100%" >
+<div id="image-blocker">&nbsp;</div>
+<div id="u">&nbsp;</div>
+<div id="l">&nbsp;</div>
+<div id="r">&nbsp;</div>
+</div>
+</object><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+</body>
+</html>
